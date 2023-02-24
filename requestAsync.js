@@ -5,23 +5,28 @@ function requestCallback(url, callback) {
     const start = Date.now();
     
     var request = require('request');
+
     request({ url, json: true }, (error, { body }) => {
         if (error) { return console.log(error) }
 
         const end = Date.now();
-        console.log(`Execution time: ${end - start} ms`);
+        callback(`Execution time: ${end - start} ms`);
       })
 }
+
 
 function requestPromise(url) {
         // write code to request url asynchronously with Promise
         const start = Date.now();
-       
+
         return fetch(url)
-        .then(function(response){
+        .then(response => {
             const end = Date.now();
-            console.log(`Execution time2: ${end - start} ms`);
-        });
+            return `Execution time2: ${end - start} ms` //there must be return value in Promise. 
+            //resolve('Execution time2: ${end - start} ms');
+        }).catch(err => {
+            console.log(err);
+          });
 }
 
 async function requestAsyncAwait(url) {
@@ -29,13 +34,12 @@ async function requestAsyncAwait(url) {
     // you should call requestPromise here and get the result usingasync/await.
     const start = Date.now();
 
-    const res = await fetch(url);
-    //const res = await requestPromise(url);
+    const res = await requestPromise(url);
 
     const end = Date.now();
     console.log(`Execution time3: ${end - start} ms`);
 }
 
 requestCallback(url, console.log); // would print out the execution time
-requestPromise(url).then(console.log());
+requestPromise(url).then(console.log);
 requestAsyncAwait(url);

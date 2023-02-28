@@ -1,14 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+var validator = require('validator');
 
-var database = require('./db')
-const con = require('./db');
-var User = require("./modules/userModule");
+//var database = require('./db')
+//const con = require('./db');
+//var User = require("./modules/userModule");
 //import userController from './controllers/userController';
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: true })); // version > 4.16 has built in unlencoded
+app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 
 app.get("", (req, res) => {
     res.send("Hello");
@@ -37,7 +40,8 @@ app.get('/users', (req, res) => {
         console.error('Error connecting to MySQL database:', err);
         res.status(500).send('Error connecting to MySQL database');
     } else {
-        const sql = 'SELECT id, name, email FROM user';
+        const ID = req.query.id;
+        const sql = 'SELECT id, name, email FROM user WHERE id = ' + ID;
         connection.query(sql, (error, results) => {
         if (error) {
             console.error('Error fetching user data from MySQL database:', error);
@@ -46,7 +50,7 @@ app.get('/users', (req, res) => {
             const responseData = {
             data: {
                 user: results,
-                date: new Date().toUTCString()
+                date: req.headers['request-date'],
             }
             };
             res.status(200).json(responseData);
@@ -64,16 +68,14 @@ app.post('/users', (req, res) => {
     const password = req.body.password;
 
     // Check if the username matches the alphanumeric pattern
-    const alphanumeric = /^[a-z0-9]+$/i;
-    if (!alphanumeric.test(name)) {
+    if (!validator.isAlphanumeric(name)) {
         return res.status(400).json({ message: 'Username can only contain alphabets and numbers.' });
     }
 
     // Check if the email matches the email pattern
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!validator.isEmail(email)) {
         return res.status(400).json({ message: 'Email format is not valid.' });
-    }
+      }
 
     // Check if the password matches the password pattern
     const uppercaseRegex = /[A-Z]/;
@@ -95,9 +97,9 @@ app.post('/users', (req, res) => {
     
     pool.getConnection((err, connection) => {
         if (err) {
-          console.error('Error connecting to MySQL database:', err);
-          res.status(500).send('Error connecting to MySQL database');
-        } else {
+            console.error('Error connecting to MySQL database:', err);
+            res.status(500).send('Error connecting to MySQL database');
+        }else {
             const sql = 'INSERT INTO user (name, email, password) VALUES (?, ?, ?)';
             connection.query(sql, [name, email, password], (error, results) => {
             if (error) {
@@ -109,20 +111,20 @@ app.post('/users', (req, res) => {
                     console.error('Error inserting user data into MySQL database:', error);
                     res.status(500).send('Error inserting user data into MySQL database');
                 }
-            } else {
-              console.log('User data inserted into MySQL database');
-              // Return a success message as a response
-              //res.status(200).send('User data inserted into MySQL database');
-              res.status(200).json({
+            }else {
+                console.log('User data inserted into MySQL database');
+                // Return a success message as a response
+                //res.status(200).send('User data inserted into MySQL database');
+                res.status(200).json({
                 data: {
                     user: {
                         id: results.insertId,
                         name: name,
                         email: email,
                     },
-                    date: new Date().toGMTString(),
+                    date: req.headers['request-date'],
                 },
-            });
+                });
             }
             // Release the MySQL connection
             connection.release();

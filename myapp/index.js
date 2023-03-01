@@ -1,15 +1,16 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const app = express();
+const mysql = require('mysql2');
+
 var validator = require('validator');
+
+//const router = require('./router');
 
 //var database = require('./db')
 //const con = require('./db');
 //var User = require("./modules/userModule");
 //import userController from './controllers/userController';
 
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({ extended: true })); // version > 4.16 has built in unlencoded
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
@@ -25,7 +26,6 @@ app.listen(3000, () => {
     console.log("listening on http://localhost:3000");
 })
 
-const mysql = require('mysql2');
 
 const pool = mysql.createPool({
     host: "database-1.creu8l56kqj6.ap-northeast-1.rds.amazonaws.com",

@@ -15,6 +15,11 @@ var validator = require('validator');
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
+app.use(function(req, res, next) {
+    res.setHeader("Content-Security-Policy", "img-src 'self' http://52.68.0.127");
+    next();
+  });
+  
 app.use(cors({
     origin: 'http://localhost:3001'
   }));

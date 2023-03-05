@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const mysql = require('mysql2');
 
 var validator = require('validator');
@@ -14,11 +15,16 @@ var validator = require('validator');
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.get("", (req, res) => {
+app.use(cors({
+    origin: 'http://localhost:3001'
+  }));
+  
+
+app.get("/", (req, res) => {
     res.send("Hello");
 });
 
-app.get('/healthcheck', (req, res) => {
+app.get('./healthcheck', (req, res) => {
     res.status(200).send('OK')
 })
 
@@ -41,7 +47,19 @@ app.get('/users', (req, res) => {
         res.status(500).send('Error connecting to MySQL database');
     } else {
         const ID = req.query.id;
-        const sql = 'SELECT id, name, email FROM user WHERE id = ' + ID;
+        const Email = req.query.email;
+        // const sql = 'SELECT id, name, email FROM user WHERE id = ' + ID;
+        let sql = '';
+
+        if(!ID){
+            sql = `SELECT id, name, email FROM user WHERE email = '${Email}'`;
+        }
+        else{
+            sql = `SELECT id, name, email FROM user WHERE id = '${ID}'`;
+        }
+
+
+
         connection.query(sql, (error, results) => {
         if (error) {
             console.error('Error fetching user data from MySQL database:', error);

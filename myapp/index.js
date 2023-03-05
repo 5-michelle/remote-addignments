@@ -16,10 +16,11 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
 app.use(function(req, res, next) {
-    res.setHeader("Content-Security-Policy", "img-src 'self' http://52.68.0.127");
+    res.setHeader("Content-Security-Policy", "img-src 'self' https://fonts.googleapis.com");
+    res.setHeader("Content-Security-Policy", "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com data:");
     next();
   });
-  
+
 app.use(cors({
     origin: 'http://localhost:3001'
   }));
@@ -29,7 +30,7 @@ app.get("/", (req, res) => {
     res.send("Hello");
 });
 
-app.get('./healthcheck', (req, res) => {
+app.get('/healthcheck', (req, res) => {
     res.status(200).send('OK')
 })
 

@@ -19,12 +19,26 @@ app.use(express.urlencoded({extended: true}))
 //     res.setHeader("Content-Security-Policy", "img-src 'self' https://fonts.googleapis.com");
 //     res.setHeader("Content-Security-Policy", "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com data:");
 //     next();
-//   });
+// });
 
 app.use(cors({
-    origin: 'http://localhost:3001'
+    origin: 'http://localhost:3001',
+    origin: 'http://52.68.0.127:3001', 
+    origin: 'http://52.68.0.127'
   }));
-  
+
+// app.use((req, res, next) => {
+// res.setHeader('Access-Control-Allow-Origin', 'http://52.68.0.127');
+// next();
+// });
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://52.68.0.127');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+  });
 
 app.get("/", (req, res) => {
     res.send("Hello");

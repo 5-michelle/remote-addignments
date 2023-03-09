@@ -19,7 +19,9 @@ function Register(){
 
         let item = {name, password, email}
         console.warn(item)
-        let result = await fetch("http://localhost:3000/users",{
+        // let result = await fetch("http://localhost:3000/users", {
+        let result = await fetch("http://52.68.0.127/api/users", {
+
             method: 'POST',
             body:JSON.stringify(item),
             headers:{
@@ -53,7 +55,7 @@ function Register(){
                 <input value={name} name="name" onChange={(e) => setName(e.target.value)} id="name" placeholder="name" />
                 <br></br>
                 <label htmlFor="email">email: </label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)}type="email" placeholder="email@gmail.com" id="email" name="email" />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="email@gmail.com" id="email" name="email" />
                 <br></br>
                 <label htmlFor="password">password: </label>
                 <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="password" id="password" name="password" />

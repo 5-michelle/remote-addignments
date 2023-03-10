@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const mysql = require('mysql2');
 
 var validator = require('validator');
@@ -14,7 +15,32 @@ var validator = require('validator');
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.get("", (req, res) => {
+// app.use(function(req, res, next) {
+//     res.setHeader("Content-Security-Policy", "img-src 'self' https://fonts.googleapis.com");
+//     res.setHeader("Content-Security-Policy", "font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com data:");
+//     next();
+// });
+
+app.use(cors({
+    origin: 'http://localhost:3001',
+    origin: 'http://52.68.0.127:3001', 
+    origin: 'http://52.68.0.127'
+  }));
+
+// app.use((req, res, next) => {
+// res.setHeader('Access-Control-Allow-Origin', 'http://52.68.0.127');
+// next();
+// });
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://52.68.0.127');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+  });
+
+app.get("/", (req, res) => {
     res.send("Hello");
 });
 
@@ -41,7 +67,19 @@ app.get('/users', (req, res) => {
         res.status(500).send('Error connecting to MySQL database');
     } else {
         const ID = req.query.id;
-        const sql = 'SELECT id, name, email FROM user WHERE id = ' + ID;
+        const Email = req.query.email;
+        // const sql = 'SELECT id, name, email FROM user WHERE id = ' + ID;
+        let sql = '';
+
+        if(!ID){
+            sql = `SELECT id, name, email FROM user WHERE email = '${Email}'`;
+        }
+        else{
+            sql = `SELECT id, name, email FROM user WHERE id = '${ID}'`;
+        }
+
+
+
         connection.query(sql, (error, results) => {
         if (error) {
             console.error('Error fetching user data from MySQL database:', error);
